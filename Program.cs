@@ -386,3 +386,13 @@ static Category? InputCategory(DataContext db, NLog.Logger logger)
     }
     return category;
 }
+
+static void AddCategory(DataContext db, NLog.Logger logger)
+{
+    Category? category = InputCategory(db, logger);
+    if (category != null)
+    {
+        db.AddCategory(category);
+        logger.Info("Category added - {name}", category.CategoryName);
+    }
+}
