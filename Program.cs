@@ -432,3 +432,87 @@ static void DisplaySingleCategoryWithProducts(DataContext db)
             foreach (var p in activeProducts)
                 Console.WriteLine($"  - {p.ProductName}");
         }
+         else
+        {
+            Console.WriteLine("Category not found.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Invalid CategoryId.");
+    }
+
+    Console.WriteLine("Press Enter to return to menu...");
+    Console.ReadLine();
+}
+
+  string? choice = Console.ReadLine();
+  Console.Clear();
+
+  logger.Info("Option {choice} selected", choice);
+
+  if (choice == "1")
+  {
+    // display blogs
+    var db = new DataContext();
+    var query = db.Blogs.OrderBy(b => b.Name);
+    Console.WriteLine($"{query.Count()} Blogs returned");
+    foreach (var item in query)
+    {
+      Console.WriteLine(item.Name);
+    }
+  }
+  else if (choice == "2")
+  {
+    // Add blog
+   var db = new DataContext();
+    Blog? blog = InputBlog(db, logger);
+    if (blog != null)
+    {
+     //blog.BlogId = BlogId;
+      db.AddBlog(blog);
+      logger.Info("Blog added - {name}", blog.Name);
+    }
+  }
+
+  else if (choice == "5")
+  {
+    // delete blog
+    Console.WriteLine("Choose the blog to delete:");
+     var db = new DataContext();
+    var blog = GetBlog(db);
+    if (blog != null)
+    {
+
+      // delete blog
+      db.DeleteBlog(blog);
+      logger.Info($"Blog (id: {blog.BlogId}) deleted");
+    }
+    else
+    {
+      logger.Error("Blog is null");
+    }
+  }
+   else if (choice == "6")
+  {
+    // edit blog
+    Console.WriteLine("Choose the blog to edit:");
+    var db = new DataContext();
+    var blog = GetBlog(db);
+    if (blog != null)
+    {
+        // input blog
+      Blog? UpdatedBlog = InputBlog(db, logger);
+      if (UpdatedBlog != null)
+      {
+        UpdatedBlog.BlogId = blog.BlogId;
+        db.EditBlog(UpdatedBlog);
+        logger.Info($"Blog (id: {blog.BlogId}) updated");
+      }
+    }
+  }
+  else if (String.IsNullOrEmpty(choice))
+  {
+    break;
+  }
+  Console.WriteLine();
