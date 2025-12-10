@@ -10,6 +10,12 @@ public class DataContext : DbContext
     this.Blogs.Add(blog);
     this.SaveChanges();
   }
+   public void DeleteBlog(Blog blog)
+  {
+    this.Blogs.Remove(blog);
+    this.SaveChanges();
+  }
+
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
