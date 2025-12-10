@@ -6,22 +6,85 @@ var logger = LogManager.Setup().LoadConfigurationFromFile(path).GetCurrentClassL
 
 logger.Info("Program started");
 
-// Create and save a new Blog
-Console.Write("Enter a name for a new Blog: ");
-var name = Console.ReadLine();
+do
+{Console.WriteLine("Enter your selection:");
+  Console.WriteLine("1) Display all blogs");
+  Console.WriteLine("2) Add Blog");
+  Console.WriteLine("5) Delete Blog");
+    Console.WriteLine("6) Edit Blog");
+  Console.WriteLine("Enter to quit");
 
-var blog = new Blog { Name = name };
+  string? choice = Console.ReadLine();
+  Console.Clear();
 
-var db = new DataContext();
-db.AddBlog(blog);
-logger.Info("Blog added - {name}", name);
+  logger.Info("Option {choice} selected", choice);
 
-// Display all Blogs from the database
-var query = db.Blogs.OrderBy(b => b.Name);
+  if (choice == "1")
+  {
+    // display blogs
+    var db = new DataContext();
+    var query = db.Blogs.OrderBy(b => b.Name);
+    Console.WriteLine($"{query.Count()} Blogs returned");
+    foreach (var item in query)
+    {
+      Console.WriteLine(item.Name);
+    }
+  }
+  else if (choice == "2")
+  {
+    // Add blog
+   var db = new DataContext();
+    Blog? blog = InputBlog(db, logger);
+    if (blog != null)
+    {
+     //blog.BlogId = BlogId;
+      db.AddBlog(blog);
+      logger.Info("Blog added - {name}", blog.Name);
+    }
+  }
 
-Console.WriteLine("All blogs in the database:");
-foreach (var item in query)
-{
-  Console.WriteLine(item.Name);
-}
+  else if (choice == "5")
+  {
+    // delete blog
+    Console.WriteLine("Choose the blog to delete:");
+     var db = new DataContext();
+    var blog = GetBlog(db);
+    if (blog != null)
+    {
+
+      // delete blog
+      db.DeleteBlog(blog);
+      logger.Info($"Blog (id: {blog.BlogId}) deleted");
+    }
+    else
+    {
+      logger.Error("Blog is null");
+    }
+  }
+   else if (choice == "6")
+  {
+    // edit blog
+    Console.WriteLine("Choose the blog to edit:");
+    var db = new DataContext();
+    var blog = GetBlog(db);
+    if (blog != null)
+    {
+        // input blog
+      Blog? UpdatedBlog = InputBlog(db, logger);
+      if (UpdatedBlog != null)
+      {
+        UpdatedBlog.BlogId = blog.BlogId;
+        db.EditBlog(UpdatedBlog);
+        logger.Info($"Blog (id: {blog.BlogId}) updated");
+      }
+    }
+  }
+  else if (String.IsNullOrEmpty(choice))
+  {
+    break;
+  }
+  Console.WriteLine();
+} while (true);
+
+
 logger.Info("Program ended");
