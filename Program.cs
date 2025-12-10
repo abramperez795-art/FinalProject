@@ -96,6 +96,53 @@ do
         foreach (var p in products)
             Console.WriteLine($"{p.ProductId}: {p.ProductName} {(p.IsDiscontinued ? "[DISCONTINUED]" : "[ACTIVE]")}");
     }
+     else if (choice == "8")
+    {
+        var db = new DataContext();
+        DisplaySingleProduct(db);
+    }
+    else if (choice == "9")
+    {
+        var db = new DataContext();
+        AddProduct(db, logger);
+    }
+    else if (choice == "10")
+    {
+        var db = new DataContext();
+        EditProduct(db, logger);
+    }
+    else if (choice == "11")
+    {
+        Console.WriteLine("Choose the product to delete:");
+        var db = new DataContext();
+        DeleteProduct(db, logger);
+    }
+    else if (choice == "12")
+    {
+        var db = new DataContext();
+        DisplayCategories(db);
+    }
+    else if (choice == "13")
+    {
+        var db = new DataContext();
+        DisplayCategoriesWithActiveProducts(db);
+    }
+    else if (choice == "14")
+    {
+        var db = new DataContext();
+        AddCategory(db, logger);
+    }
+    else if (choice == "15")
+    {
+        var db = new DataContext();
+        EditCategory(db, logger);
+    }
+    else if (choice == "16")
+    {
+        Console.WriteLine("Choose category to display:");
+        var db = new DataContext();
+        DisplaySingleCategoryWithProducts(db);
+    }
 
 
   }
