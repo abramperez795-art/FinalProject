@@ -105,6 +105,12 @@ do
       }
     }
   }
+
+  else if (choice == "5")
+  {
+    // delete blog
+    Console.WriteLine("Choose the blog to delete:");
+  }
   else if (String.IsNullOrEmpty(choice))
   {
     break;
