@@ -320,3 +320,11 @@ static void DeleteProduct(DataContext db, NLog.Logger logger)
         Console.WriteLine("Invalid ProductId.");
     }
 }
+
+static void DisplayCategories(DataContext db)
+{
+    var query = db.Categories.OrderBy(c => c.CategoryName);
+    Console.WriteLine($"{query.Count()} Categories returned");
+    foreach (var item in query)
+        Console.WriteLine(item.CategoryName);
+}
