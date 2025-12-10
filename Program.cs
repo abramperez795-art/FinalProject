@@ -80,6 +80,24 @@ do
         logger.Info($"Blog (id: {blog.BlogId}) updated");
       }
     }
+
+    else if (choice == "7")
+    {
+        var db = new DataContext();
+        Console.WriteLine("1) All  2) Active only  3) Discontinued only");
+        string? filter = Console.ReadLine();
+        var products = filter switch
+        {
+            "2" => db.Products.Where(p => !p.IsDiscontinued).OrderBy(p => p.ProductName),
+            "3" => db.Products.Where(p => p.IsDiscontinued).OrderBy(p => p.ProductName),
+            _ => db.Products.OrderBy(p => p.ProductName)
+        };
+        Console.WriteLine($"{products.Count()} Products returned");
+        foreach (var p in products)
+            Console.WriteLine($"{p.ProductId}: {p.ProductName} {(p.IsDiscontinued ? "[DISCONTINUED]" : "[ACTIVE]")}");
+    }
+
+
   }
   else if (String.IsNullOrEmpty(choice))
   {
