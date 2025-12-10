@@ -288,3 +288,35 @@ static void EditProduct(DataContext db, NLog.Logger logger)
         Console.WriteLine("Product updated.");
     }
 }
+
+static void DeleteProduct(DataContext db, NLog.Logger logger)
+{
+    // show all products
+    var products = db.Products.OrderBy(p => p.ProductId);
+    foreach (Product p in products)
+    {
+        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+    }
+
+    Console.WriteLine("Enter the ProductId to delete:");
+    if (int.TryParse(Console.ReadLine(), out int productId))
+    {
+        Product? product = db.Products.FirstOrDefault(p => p.ProductId == productId);
+        if (product != null)
+        {
+            db.Products.Remove(product);
+            db.SaveChanges();
+            logger.Info($"Product (id: {product.ProductId}) deleted");
+            Console.WriteLine("Product deleted.");
+        }
+        else
+        {
+            Console.WriteLine("Product not found.");
+            logger.Error("Product not found for deletion");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Invalid ProductId.");
+    }
+}
