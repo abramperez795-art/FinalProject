@@ -328,3 +328,18 @@ static void DisplayCategories(DataContext db)
     foreach (var item in query)
         Console.WriteLine(item.CategoryName);
 }
+
+static void DisplayCategoriesWithActiveProducts(DataContext db)
+{
+    var categories = db.Categories
+        .OrderBy(c => c.CategoryName)
+        .ToList();
+
+    Console.WriteLine($"{categories.Count} Categories returned");
+
+   
+    foreach (var c in categories)
+    {
+        Console.WriteLine($"{c.CategoryName} - active products");
+    }
+}
