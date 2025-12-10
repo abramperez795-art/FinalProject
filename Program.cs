@@ -106,3 +106,50 @@ static Blog? GetBlog(DataContext db)
   }
   return null;
 }
+static Blog? InputBlog(DataContext db, NLog.Logger logger)
+{
+  Blog blog = new();
+  Console.WriteLine("Enter the Blog name");
+  blog.Name = Console.ReadLine();
+
+  ValidationContext context = new(blog, null, null);
+  List<ValidationResult> results = [];
+
+  var isValid = Validator.TryValidateObject(blog, context, results, true);
+  if (isValid)
+  {
+    // check for unique name
+    if (db.Blogs.Any(b => b.Name == blog.Name))
+    {
+      // generate validation error
+      isValid = false;
+      results.Add(new ValidationResult("Blog name exists", ["Name"]));
+    }
+    else
+    {
+      logger.Info("Validation passed");
+    }
+  }
+  if (!isValid)
+  {
+    foreach (var result in results)
+    {
+      logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+    }
+    return null;
+  }
+  return blog;
+}{
+  // display all blogs
+  var blogs = db.Blogs.OrderBy(b => b.BlogId);
+  foreach (Blog b in blogs)
+  {
+    Console.WriteLine($"{b.BlogId}: {b.Name}");
+  }
+  if (int.TryParse(Console.ReadLine(), out int BlogId))
+  {
+    Blog blog = db.Blogs.FirstOrDefault(b => b.BlogId == BlogId)!;
+    return blog;
+  }
+  return null;
+}
