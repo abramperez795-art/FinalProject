@@ -396,3 +396,19 @@ static void AddCategory(DataContext db, NLog.Logger logger)
         logger.Info("Category added - {name}", category.CategoryName);
     }
 }
+
+static void EditCategory(DataContext db, NLog.Logger logger)
+{
+    Console.WriteLine("Choose the category to edit:");
+    var category = GetCategory(db);
+    if (category != null)
+    {
+        Category? updatedCategory = InputCategory(db, logger);
+        if (updatedCategory != null)
+        {
+            updatedCategory.CategoryId = category.CategoryId;
+            db.EditCategory(updatedCategory);
+            logger.Info($"Category (id: {category.CategoryId}) updated");
+        }
+    }
+}
