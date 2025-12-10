@@ -356,3 +356,33 @@ static Category? GetCategory(DataContext db)
     }
     return null;
 }
+
+
+static Category? InputCategory(DataContext db, NLog.Logger logger)
+{
+    Category category = new();
+    Console.WriteLine("Enter the Category name:");
+    category.CategoryName = Console.ReadLine();
+
+    ValidationContext context = new(category, null, null);
+    List<ValidationResult> results = new();
+    var isValid = Validator.TryValidateObject(category, context, results, true);
+
+    if (isValid)
+    {
+        if (db.Categories.Any(c => c.CategoryName == category.CategoryName))
+        {
+            isValid = false;
+            results.Add(new ValidationResult("Category name exists", new[] { "CategoryName" }));
+        }
+        else logger.Info("Validation passed");
+    }
+
+    if (!isValid)
+    {
+        foreach (var result in results)
+            logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+        return null;
+    }
+    return category;
+}
