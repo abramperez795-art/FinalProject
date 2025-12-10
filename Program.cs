@@ -2,84 +2,94 @@
 using System.ComponentModel.DataAnnotations;
 string path = Directory.GetCurrentDirectory() + "//nlog.config";
 
-// create instance of Logger
+
+
 var logger = LogManager.Setup().LoadConfigurationFromFile(path).GetCurrentClassLogger();
+
 
 logger.Info("Program started");
 
 
+
 do
-{Console.WriteLine("Enter your selection:");
-  Console.WriteLine("1) Display all blogs");
-  Console.WriteLine("2) Add Blog");
-  Console.WriteLine("5) Delete Blog");
+{
+    Console.WriteLine("Enter your selection:");
+    Console.WriteLine("1) Display all blogs");
+    Console.WriteLine("2) Add Blog");
+    Console.WriteLine("5) Delete Blog");
     Console.WriteLine("6) Edit Blog");
-  Console.WriteLine("Enter to quit");
+    Console.WriteLine("7) Display all products");
+    Console.WriteLine("8) Display single product");
+    Console.WriteLine("9) Add product");
+    Console.WriteLine("10) Edit product");
+    Console.WriteLine("11) Delete product");
+    Console.WriteLine("12) Display categories");
+    Console.WriteLine("13) Display categories with active products");
+    Console.WriteLine("14) Add category");
+    Console.WriteLine("15) Edit category");
+    Console.WriteLine("16) Delete category");
+    Console.WriteLine("Enter to quit");
 
-  string? choice = Console.ReadLine();
-  Console.Clear();
 
-  logger.Info("Option {choice} selected", choice);
+    string? choice = Console.ReadLine();
+    Console.Clear();
 
-  if (choice == "1")
-  {
-    // display blogs
-    var db = new DataContext();
-    var query = db.Blogs.OrderBy(b => b.Name);
-    Console.WriteLine($"{query.Count()} Blogs returned");
-    foreach (var item in query)
-    {
-      Console.WriteLine(item.Name);
-    }
-  }
-  else if (choice == "2")
-  {
-    // Add blog
-   var db = new DataContext();
-    Blog? blog = InputBlog(db, logger);
-    if (blog != null)
-    {
-     //blog.BlogId = BlogId;
-      db.AddBlog(blog);
-      logger.Info("Blog added - {name}", blog.Name);
-    }
-  }
 
-  else if (choice == "5")
-  {
-    // delete blog
-    Console.WriteLine("Choose the blog to delete:");
-     var db = new DataContext();
-    var blog = GetBlog(db);
-    if (blog != null)
-    {
+    logger.Info("Option {choice} selected", choice);
 
-      // delete blog
-      db.DeleteBlog(blog);
-      logger.Info($"Blog (id: {blog.BlogId}) deleted");
-    }
-    else
+
+    if (choice == "1")
     {
-      logger.Error("Blog is null");
+        var db = new DataContext();
+        var query = db.Blogs.OrderBy(b => b.Name);
+        Console.WriteLine($"{query.Count()} Blogs returned");
+        foreach (var item in query)
+        {
+            Console.WriteLine(item.Name);
+        }
     }
-  }
-   else if (choice == "6")
-  {
-    // edit blog
-    Console.WriteLine("Choose the blog to edit:");
-    var db = new DataContext();
-    var blog = GetBlog(db);
-    if (blog != null)
+    else if (choice == "2")
     {
-        // input blog
-      Blog? UpdatedBlog = InputBlog(db, logger);
-      if (UpdatedBlog != null)
-      {
-        UpdatedBlog.BlogId = blog.BlogId;
-        db.EditBlog(UpdatedBlog);
-        logger.Info($"Blog (id: {blog.BlogId}) updated");
-      }
+        var db = new DataContext();
+        Blog? blog = InputBlog(db, logger);
+        if (blog != null)
+        {
+            db.AddBlog(blog);
+            logger.Info("Blog added - {name}", blog.Name);
+        }
     }
+    else if (choice == "5")
+    {
+        Console.WriteLine("Choose the blog to delete:");
+        var db = new DataContext();
+        var blog = GetBlog(db);
+        if (blog != null)
+        {
+            db.DeleteBlog(blog);
+            logger.Info($"Blog (id: {blog.BlogId}) deleted");
+        }
+        else
+        {
+            logger.Error("Blog is null");
+        }
+    }
+    else if (choice == "6")
+    {
+        Console.WriteLine("Choose the blog to edit:");
+        var db = new DataContext();
+        var blog = GetBlog(db);
+        if (blog != null)
+        {
+            Blog? UpdatedBlog = InputBlog(db, logger);
+            if (UpdatedBlog != null)
+            {
+                UpdatedBlog.BlogId = blog.BlogId;
+                db.EditBlog(UpdatedBlog);
+                logger.Info($"Blog (id: {blog.BlogId}) updated");
+            }
+        }
+    }
+
 
     else if (choice == "7")
     {
@@ -96,7 +106,10 @@ do
         foreach (var p in products)
             Console.WriteLine($"{p.ProductId}: {p.ProductName} {(p.IsDiscontinued ? "[DISCONTINUED]" : "[ACTIVE]")}");
     }
-     else if (choice == "8")
+
+
+
+    else if (choice == "8")
     {
         var db = new DataContext();
         DisplaySingleProduct(db);
@@ -143,86 +156,86 @@ do
         var db = new DataContext();
         DisplaySingleCategoryWithProducts(db);
     }
+    else if (string.IsNullOrEmpty(choice))
+    {
+        logger.Info("Program ended");
+        break;
+    }
+    else
+    {
+        Console.WriteLine("Invalid choice");
+    }
 
 
-  }
-  else if (String.IsNullOrEmpty(choice))
-  {
-    break;
-  }
-  Console.WriteLine();
+    Console.WriteLine();
+
+
 } while (true);
 
 
 logger.Info("Program ended");
 
+
 static Blog? GetBlog(DataContext db)
 {
-  // display all blogs
-  var blogs = db.Blogs.OrderBy(b => b.BlogId);
-  foreach (Blog b in blogs)
-  {
-    Console.WriteLine($"{b.BlogId}: {b.Name}");
-  }
-  if (int.TryParse(Console.ReadLine(), out int BlogId))
-  {
-    Blog blog = db.Blogs.FirstOrDefault(b => b.BlogId == BlogId)!;
-    return blog;
-  }
-  return null;
+    // display all blogs
+    var blogs = db.Blogs.OrderBy(b => b.BlogId);
+    foreach (Blog b in blogs)
+    {
+        Console.WriteLine($"{b.BlogId}: {b.Name}");
+    }
+    if (int.TryParse(Console.ReadLine(), out int BlogId))
+    {
+        Blog blog = db.Blogs.FirstOrDefault(b => b.BlogId == BlogId)!;
+        return blog;
+    }
+    return null;
 }
 static Blog? InputBlog(DataContext db, NLog.Logger logger)
 {
-  Blog blog = new();
-  Console.WriteLine("Enter the Blog name");
-  blog.Name = Console.ReadLine();
+    Blog blog = new();
+    Console.WriteLine("Enter the Blog name");
+    blog.Name = Console.ReadLine();
 
-  ValidationContext context = new(blog, null, null);
-  List<ValidationResult> results = [];
 
-  var isValid = Validator.TryValidateObject(blog, context, results, true);
-  if (isValid)
-  {
-    // check for unique name
-    if (db.Blogs.Any(b => b.Name == blog.Name))
+    ValidationContext context = new(blog, null, null);
+    List<ValidationResult> results = new List<ValidationResult>();
+
+
+    var isValid = Validator.TryValidateObject(blog, context, results, true);
+    if (isValid)
     {
-      // generate validation error
-      isValid = false;
-      results.Add(new ValidationResult("Blog name exists", ["Name"]));
+        // check for unique name
+        if (db.Blogs.Any(b => b.Name == blog.Name))
+        {
+            // generate validation error
+            isValid = false;
+            results.Add(new ValidationResult("Blog name exists", new[] { "Name" }));
+        }
+        else
+        {
+            logger.Info("Validation passed");
+        }
     }
-    else
+    if (!isValid)
     {
-      logger.Info("Validation passed");
+        foreach (var result in results)
+        {
+            logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+        }
+        return null;
     }
-  }
-  if (!isValid)
-  {
-    foreach (var result in results)
-    {
-      logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
-    }
-    return null;
-  }
-  return blog;
-}{
-  // display all blogs
-  var blogs = db.Blogs.OrderBy(b => b.BlogId);
-  foreach (Blog b in blogs)
-  {
-    Console.WriteLine($"{b.BlogId}: {b.Name}");
-  }
-  if (int.TryParse(Console.ReadLine(), out int BlogId))
-  {
-    Blog blog = db.Blogs.FirstOrDefault(b => b.BlogId == BlogId)!;
     return blog;
-  }
-  return null;
 }
+
+
+
 static Product? GetProduct(DataContext db)
 {
     var products = db.Products.OrderBy(p => p.ProductId);
     foreach (Product p in products)
         Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+
 
     if (int.TryParse(Console.ReadLine(), out int ProductId))
     {
@@ -230,6 +243,7 @@ static Product? GetProduct(DataContext db)
     }
     return null;
 }
+
 
 static void DisplaySingleProduct(DataContext db)
 {
@@ -247,15 +261,17 @@ static void DisplaySingleProduct(DataContext db)
         {
             Console.WriteLine("Product not found.");
         }
-            }
+    }
     else
     {
         Console.WriteLine("Invalid ProductId.");
     }
 
+
     Console.WriteLine("Press Enter to return to menu...");
     Console.ReadLine();
 }
+
 
 static void AddProduct(DataContext db, NLog.Logger logger)
 {
@@ -263,14 +279,18 @@ static void AddProduct(DataContext db, NLog.Logger logger)
     Console.WriteLine("Enter the Product name:");
     product.ProductName = Console.ReadLine();
 
+
     product.IsDiscontinued = false;
+
 
     db.Products.Add(product);
     db.SaveChanges();
 
+
     logger.Info("Product added - {product.ProductName}", product.ProductName);
     Console.WriteLine("Product added.");
 }
+
 
 static void EditProduct(DataContext db, NLog.Logger logger)
 {
@@ -288,7 +308,6 @@ static void EditProduct(DataContext db, NLog.Logger logger)
         Console.WriteLine("Product updated.");
     }
 }
-
 static void DeleteProduct(DataContext db, NLog.Logger logger)
 {
     // show all products
@@ -297,6 +316,7 @@ static void DeleteProduct(DataContext db, NLog.Logger logger)
     {
         Console.WriteLine($"{p.ProductId}: {p.ProductName}");
     }
+
 
     Console.WriteLine("Enter the ProductId to delete:");
     if (int.TryParse(Console.ReadLine(), out int productId))
@@ -321,6 +341,10 @@ static void DeleteProduct(DataContext db, NLog.Logger logger)
     }
 }
 
+
+
+
+
 static void DisplayCategories(DataContext db)
 {
     var query = db.Categories.OrderBy(c => c.CategoryName);
@@ -329,13 +353,17 @@ static void DisplayCategories(DataContext db)
         Console.WriteLine(item.CategoryName);
 }
 
+
+
 static void DisplayCategoriesWithActiveProducts(DataContext db)
 {
     var categories = db.Categories
         .OrderBy(c => c.CategoryName)
         .ToList();
 
+
     Console.WriteLine($"{categories.Count} Categories returned");
+
 
    
     foreach (var c in categories)
@@ -343,6 +371,10 @@ static void DisplayCategoriesWithActiveProducts(DataContext db)
         Console.WriteLine($"{c.CategoryName} - active products");
     }
 }
+
+
+
+
 
 static Category? GetCategory(DataContext db)
 {
@@ -364,9 +396,11 @@ static Category? InputCategory(DataContext db, NLog.Logger logger)
     Console.WriteLine("Enter the Category name:");
     category.CategoryName = Console.ReadLine();
 
+
     ValidationContext context = new(category, null, null);
     List<ValidationResult> results = new();
     var isValid = Validator.TryValidateObject(category, context, results, true);
+
 
     if (isValid)
     {
@@ -378,6 +412,7 @@ static Category? InputCategory(DataContext db, NLog.Logger logger)
         else logger.Info("Validation passed");
     }
 
+
     if (!isValid)
     {
         foreach (var result in results)
@@ -386,6 +421,7 @@ static Category? InputCategory(DataContext db, NLog.Logger logger)
     }
     return category;
 }
+
 
 static void AddCategory(DataContext db, NLog.Logger logger)
 {
@@ -396,6 +432,7 @@ static void AddCategory(DataContext db, NLog.Logger logger)
         logger.Info("Category added - {name}", category.CategoryName);
     }
 }
+
 
 static void EditCategory(DataContext db, NLog.Logger logger)
 {
@@ -413,6 +450,8 @@ static void EditCategory(DataContext db, NLog.Logger logger)
     }
 }
 
+
+
 static void DisplaySingleCategoryWithProducts(DataContext db)
 {
     Console.WriteLine("Enter CategoryId:");
@@ -423,16 +462,18 @@ static void DisplaySingleCategoryWithProducts(DataContext db)
         {
             Console.WriteLine($"{category.CategoryId}: {category.CategoryName}");
 
+
             // list all active products
             var activeProducts = db.Products
                 .Where(p => !p.IsDiscontinued)
                 .OrderBy(p => p.ProductName);
 
+
             Console.WriteLine($"\n{activeProducts.Count()} active products:");
             foreach (var p in activeProducts)
                 Console.WriteLine($"  - {p.ProductName}");
         }
-         else
+        else
         {
             Console.WriteLine("Category not found.");
         }
@@ -442,77 +483,7 @@ static void DisplaySingleCategoryWithProducts(DataContext db)
         Console.WriteLine("Invalid CategoryId.");
     }
 
+
     Console.WriteLine("Press Enter to return to menu...");
     Console.ReadLine();
 }
-
-  string? choice = Console.ReadLine();
-  Console.Clear();
-
-  logger.Info("Option {choice} selected", choice);
-
-  if (choice == "1")
-  {
-    // display blogs
-    var db = new DataContext();
-    var query = db.Blogs.OrderBy(b => b.Name);
-    Console.WriteLine($"{query.Count()} Blogs returned");
-    foreach (var item in query)
-    {
-      Console.WriteLine(item.Name);
-    }
-  }
-  else if (choice == "2")
-  {
-    // Add blog
-   var db = new DataContext();
-    Blog? blog = InputBlog(db, logger);
-    if (blog != null)
-    {
-     //blog.BlogId = BlogId;
-      db.AddBlog(blog);
-      logger.Info("Blog added - {name}", blog.Name);
-    }
-  }
-
-  else if (choice == "5")
-  {
-    // delete blog
-    Console.WriteLine("Choose the blog to delete:");
-     var db = new DataContext();
-    var blog = GetBlog(db);
-    if (blog != null)
-    {
-
-      // delete blog
-      db.DeleteBlog(blog);
-      logger.Info($"Blog (id: {blog.BlogId}) deleted");
-    }
-    else
-    {
-      logger.Error("Blog is null");
-    }
-  }
-   else if (choice == "6")
-  {
-    // edit blog
-    Console.WriteLine("Choose the blog to edit:");
-    var db = new DataContext();
-    var blog = GetBlog(db);
-    if (blog != null)
-    {
-        // input blog
-      Blog? UpdatedBlog = InputBlog(db, logger);
-      if (UpdatedBlog != null)
-      {
-        UpdatedBlog.BlogId = blog.BlogId;
-        db.EditBlog(UpdatedBlog);
-        logger.Info($"Blog (id: {blog.BlogId}) updated");
-      }
-    }
-  }
-  else if (String.IsNullOrEmpty(choice))
-  {
-    break;
-  }
-  Console.WriteLine();
