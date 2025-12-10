@@ -412,3 +412,23 @@ static void EditCategory(DataContext db, NLog.Logger logger)
         }
     }
 }
+
+static void DisplaySingleCategoryWithProducts(DataContext db)
+{
+    Console.WriteLine("Enter CategoryId:");
+    if (int.TryParse(Console.ReadLine(), out int id))
+    {
+        Category? category = db.Categories.Find(id);
+        if (category != null)
+        {
+            Console.WriteLine($"{category.CategoryId}: {category.CategoryName}");
+
+            // list all active products
+            var activeProducts = db.Products
+                .Where(p => !p.IsDiscontinued)
+                .OrderBy(p => p.ProductName);
+
+            Console.WriteLine($"\n{activeProducts.Count()} active products:");
+            foreach (var p in activeProducts)
+                Console.WriteLine($"  - {p.ProductName}");
+        }
