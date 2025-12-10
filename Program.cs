@@ -256,3 +256,18 @@ static void DisplaySingleProduct(DataContext db)
     Console.WriteLine("Press Enter to return to menu...");
     Console.ReadLine();
 }
+
+static void AddProduct(DataContext db, NLog.Logger logger)
+{
+    Product product = new();
+    Console.WriteLine("Enter the Product name:");
+    product.ProductName = Console.ReadLine();
+
+    product.IsDiscontinued = false;
+
+    db.Products.Add(product);
+    db.SaveChanges();
+
+    logger.Info("Product added - {product.ProductName}", product.ProductName);
+    Console.WriteLine("Product added.");
+}
