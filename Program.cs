@@ -230,3 +230,29 @@ static Product? GetProduct(DataContext db)
     }
     return null;
 }
+
+static void DisplaySingleProduct(DataContext db)
+{
+    Console.WriteLine("Enter ProductId:");
+    if (int.TryParse(Console.ReadLine(), out int id))
+    {
+        Product? product = db.Products.Find(id);
+        if (product != null)
+        {
+            Console.WriteLine($"ProductId:    {product.ProductId}");
+            Console.WriteLine($"ProductName:  {product.ProductName}");
+            Console.WriteLine($"Discontinued: {(product.IsDiscontinued ? "Yes" : "No")}");
+        }
+        else
+        {
+            Console.WriteLine("Product not found.");
+        }
+            }
+    else
+    {
+        Console.WriteLine("Invalid ProductId.");
+    }
+
+    Console.WriteLine("Press Enter to return to menu...");
+    Console.ReadLine();
+}
