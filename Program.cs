@@ -271,3 +271,20 @@ static void AddProduct(DataContext db, NLog.Logger logger)
     logger.Info("Product added - {product.ProductName}", product.ProductName);
     Console.WriteLine("Product added.");
 }
+
+static void EditProduct(DataContext db, NLog.Logger logger)
+{
+    Console.WriteLine("Choose product to edit:");
+    var product = GetProduct(db);  // Add this helper method
+    if (product != null)
+    {
+        Console.WriteLine($"Current: {product.ProductName}");
+        Console.WriteLine("New name:");
+        product.ProductName = Console.ReadLine();
+        Console.WriteLine("Discontinued? (y/n):");
+        product.IsDiscontinued = Console.ReadLine()?.ToLower() == "y";
+        db.SaveChanges();
+        logger.Info($"Product (id: {product.ProductId}) updated");
+        Console.WriteLine("Product updated.");
+    }
+}
