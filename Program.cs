@@ -218,3 +218,15 @@ static Blog? InputBlog(DataContext db, NLog.Logger logger)
   }
   return null;
 }
+static Product? GetProduct(DataContext db)
+{
+    var products = db.Products.OrderBy(p => p.ProductId);
+    foreach (Product p in products)
+        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+
+    if (int.TryParse(Console.ReadLine(), out int ProductId))
+    {
+        return db.Products.FirstOrDefault(p => p.ProductId == ProductId);
+    }
+    return null;
+}
