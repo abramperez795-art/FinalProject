@@ -343,3 +343,16 @@ static void DisplayCategoriesWithActiveProducts(DataContext db)
         Console.WriteLine($"{c.CategoryName} - active products");
     }
 }
+
+static Category? GetCategory(DataContext db)
+{
+    var categories = db.Categories.OrderBy(c => c.CategoryId);
+    foreach (Category c in categories)
+        Console.WriteLine($"{c.CategoryId}: {c.CategoryName}");
+    if (int.TryParse(Console.ReadLine(), out int CategoryId))
+    {
+        Category category = db.Categories.FirstOrDefault(c => c.CategoryId == CategoryId)!;
+        return category;
+    }
+    return null;
+}
