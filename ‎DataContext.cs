@@ -4,17 +4,21 @@ public class DataContext : DbContext
 {
   public DbSet<Blog> Blogs { get; set; }
   public DbSet<Post> Posts { get; set; }
+  public DbSet<Category> Categories { get; set; } = null!;
+  public DbSet<Product> Products { get; set; } = null!;
+
 
   public void AddBlog(Blog blog)
   {
     this.Blogs.Add(blog);
     this.SaveChanges();
   }
-   public void DeleteBlog(Blog blog)
+  public void DeleteBlog(Blog blog)
   {
     this.Blogs.Remove(blog);
     this.SaveChanges();
   }
+
   public void EditBlog(Blog UpdatedBlog)
   {
     Blog blog = Blogs.Find(UpdatedBlog.BlogId)!;
@@ -22,13 +26,33 @@ public class DataContext : DbContext
     this.SaveChanges();
   }
 
-  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-  {
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.json");
+            .AddJsonFile("appsettings.json");
+        var config = configuration.Build();
+        optionsBuilder.UseSqlServer(config["Blogs:ConnectionString"]);
+    }
 
-    var config = configuration.Build();
-    optionsBuilder.UseSqlServer(@config["Blogs:ConnectionString"]);
-    optionsBuilder.UseSqlServer(@"Server=bitsql.wctc.edu;Database=Blogs_##_XXX;User ID=YYY;Password=ZZZ");
+  public void AddCategory(Category category)
+  {
+    this.Categories.Add(category);
+    this.SaveChanges();
   }
-}
+
+  public void EditCategory(Category updatedCategory)
+  {
+    Category category = Categories.Find(updatedCategory.CategoryId)!;
+    category.CategoryName = updatedCategory.CategoryName;
+    this.SaveChanges();
+  }
+  public void DeleteCategory(Category category)
+  {
+    this.Categories.Remove(category);
+    this.SaveChanges();
+  }
+
+} 
+
+
+
