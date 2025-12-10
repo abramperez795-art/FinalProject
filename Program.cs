@@ -7,6 +7,7 @@ var logger = LogManager.Setup().LoadConfigurationFromFile(path).GetCurrentClassL
 
 logger.Info("Program started");
 
+
 do
 {Console.WriteLine("Enter your selection:");
   Console.WriteLine("1) Display all blogs");
@@ -34,38 +35,13 @@ do
   else if (choice == "2")
   {
     // Add blog
-   
+   var db = new DataContext();
     Blog? blog = InputBlog(db, logger);
     if (blog != null)
     {
-    ValidationContext context = new(blog, null, null);
-    List<ValidationResult> results = [];
-
-    var isValid = Validator.TryValidateObject(blog, context, results, true);
-    if (isValid)
-    {
-      var db = new DataContext();
-      if (db.Blogs.Any(b => b.Name == blog.Name))
-      {
-        // generate validation error
-        isValid = false;
-        results.Add(new ValidationResult("Blog name exists", ["Name"]));
-      }
-      else
-      {
-        logger.Info("Validation passed");
-        // save blog to db
-        db.AddBlog(blog);
-        logger.Info("Blog added - {name}", blog.Name);
-      }
-    }
-    if (!isValid)
-    {
-      foreach (var result in results)
-      {
-        logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
-      }
-    }
+     //blog.BlogId = BlogId;
+      db.AddBlog(blog);
+      logger.Info("Blog added - {name}", blog.Name);
     }
   }
 
@@ -103,24 +79,6 @@ do
         db.EditBlog(UpdatedBlog);
         logger.Info($"Blog (id: {blog.BlogId}) updated");
       }
-    }
-  }
-
-  else if (choice == "5")
-  {
-    // delete blog
-    Console.WriteLine("Choose the blog to delete:");
-   var db = new DataContext();
-    var blog = GetBlog(db);
-    if (blog != null)
-    {
-         // delete blog
-      db.DeleteBlog(blog);
-      logger.Info($"Blog (id: {blog.BlogId}) deleted");
-    }
-    else
-    {
-      logger.Error("Blog is null");
     }
   }
   else if (String.IsNullOrEmpty(choice))
